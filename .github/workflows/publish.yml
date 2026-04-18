@@ -47,27 +47,29 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2.6.2
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: "Release ${{ github.ref_name }}"
-          body: |
-            ## mowan-mcp-feedback ${{ github.ref_name }}
-
-            ### 安装
-
-            ```bash
-            # 使用 uvx
-            uvx mowan-mcp-feedback@${{ steps.version.outputs.tag }}
-
-            # 使用 pip
-            pip install mowan-mcp-feedback==${{ steps.version.outputs.tag }}
-            ```
-
-            ### 链接
-            - [PyPI](https://pypi.org/project/mowan-mcp-feedback/${{ steps.version.outputs.tag }}/)
-            - [完整更新日志](https://github.com/limowan/mowan-mcp-feedback/commits/${{ github.ref_name }})
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+          PACKAGE_VERSION: ${{ steps.version.outputs.tag }}
+        run: |
+          cat > release-notes.md <<EOF
+          ## mowan-mcp-feedback ${TAG_NAME}
+
+          ### 安装
+
+          \`\`\`bash
+          # 使用 uvx
+          uvx mowan-mcp-feedback@${PACKAGE_VERSION}
+
+          # 使用 pip
+          pip install mowan-mcp-feedback==${PACKAGE_VERSION}
+          \`\`\`
+
+          ### 链接
+          - [PyPI](https://pypi.org/project/mowan-mcp-feedback/${PACKAGE_VERSION}/)
+          - [完整更新日志](https://github.com/limowan/mowan-mcp-feedback/commits/${TAG_NAME})
+          EOF
+
+          gh release create "${TAG_NAME}" \
+            --title "Release ${TAG_NAME}" \
+            --notes-file release-notes.md
