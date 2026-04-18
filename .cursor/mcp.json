@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "mowan-feedback-local": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "C:\\AI编程项目\\Cursor对话专用MCP\\gl_mcp_feedback-2.1.0",
+        "python",
+        "-m",
+        "mcp_feedback_enhanced"
+      ],
+      "timeout": 14400,
+      "env": {
+        "MCP_DEBUG": "false",
+        "http_proxy": "",
+        "https_proxy": "",
+        "all_proxy": ""
+      },
+      "autoApprove": [
+        "interactive_feedback"
+      ]
+    }
+  }
+}

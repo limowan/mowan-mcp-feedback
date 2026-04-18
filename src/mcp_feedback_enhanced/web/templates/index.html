@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+
+    <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
+    <link rel="apple-touch-icon" href="/static/icon.svg">
+
+    <script src="/static/js/vendor/tailwindcss.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['DM Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'SF Mono', 'Consolas', 'monospace'],
+                    },
+                    colors: {
+                        surface: {
+                            base: '#0b0e14',
+                            raised: '#111620',
+                            overlay: '#171d2b',
+                            muted: '#1e2636',
+                        }
+                    },
+                }
+            }
+        }
+    </script>
+    <script>
+        (function() {
+            var themeKey = 'mowan-mcp-feedback-theme';
+            var theme = 'dark';
+            try {
+                theme = localStorage.getItem(themeKey) || 'dark';
+            } catch (e) {}
+            document.documentElement.setAttribute('data-theme', theme);
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --surface-base: #0b0e14;
+            --surface-overlay: #171d2b;
+            --text-primary: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-soft: #64748b;
+            --border-soft: rgba(255,255,255,0.06);
+        }
+
+        html[data-theme="light"] {
+            --surface-base: #f6f8fb;
+            --surface-overlay: #eef2f7;
+            --text-primary: #0f172a;
+            --text-muted: #475569;
+            --text-soft: #64748b;
+            --border-soft: rgba(15,23,42,0.08);
+        }
+
+        body {
+            background: var(--surface-base);
+            color: var(--text-primary);
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.35; transform: scale(1); }
+            50% { opacity: 0.1; transform: scale(1.5); }
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.2; }
+            100% { transform: scale(0.8); opacity: 0.5; }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+    </style>
+</head>
+<body class="bg-surface-base text-slate-200 font-sans h-screen flex flex-col items-center justify-center overflow-hidden antialiased">
+
+    <button id="themeToggleBtn" onclick="toggleTheme()" class="absolute top-4 right-4 flex items-center gap-1.5 text-xs font-medium text-slate-400 bg-surface-overlay border border-white/[0.06] rounded-lg px-3 py-1.5 hover:text-blue-400 hover:border-blue-500/40 transition">
+        <span id="themeToggleIcon">☀</span>
+        <span id="themeToggleText">浅色</span>
+    </button>
+
+    <div class="flex flex-col items-center gap-6 text-center px-6">
+        <!-- Logo -->
+        <div class="w-16 h-16 rounded-[18px] bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center text-[28px] text-white font-extrabold shadow-[0_8px_30px_rgba(59,130,246,0.3)] animate-[float_3s_ease-in-out_infinite]">
+            M
+        </div>
+
+        <!-- Title -->
+        <div>
+            <h1 class="text-2xl font-bold text-slate-100 mb-1.5">Mowan MCP Feedback</h1>
+            <p class="text-[15px] text-slate-400">Web UI 交互式反馈收集工具</p>
+            <span class="inline-block mt-2 font-mono text-xs text-blue-400 bg-blue-500/[0.12] px-2.5 py-0.5 rounded-full">v{{ version }}</span>
+        </div>
+
+        <!-- Status -->
+        <div class="flex items-center gap-2.5 mt-4">
+            <div class="relative w-[9px] h-[9px]">
+                <div class="absolute inset-0 rounded-full bg-amber-400"></div>
+                <div class="absolute -inset-[4px] rounded-full bg-amber-400 animate-[pulse-ring_2s_ease-in-out_infinite]"></div>
+            </div>
+            <span id="statusText" class="text-[14px] font-medium text-amber-400">等待 MCP 服务调用...</span>
+        </div>
+
+        <p class="text-xs text-slate-500 max-w-sm leading-relaxed mt-2">
+            当 AI 代理调用 <code class="font-mono text-xs text-blue-400 bg-surface-overlay px-1.5 py-0.5 rounded">interactive_feedback</code> 工具时，页面将自动跳转到反馈界面。
+        </p>
+    </div>
+
+    <script>
+        var THEME_KEY = 'mowan-mcp-feedback-theme';
+
+        function getStoredTheme() {
+            try {
+                return localStorage.getItem(THEME_KEY) || 'dark';
+            } catch (e) {
+                return 'dark';
+            }
+        }
+
+        function applyTheme(theme) {
+            var root = document.documentElement;
+            root.setAttribute('data-theme', theme);
+            if (theme === 'dark') {
+                root.classList.add('dark');
+            } else {
+                root.classList.remove('dark');
+            }
+
+            var text = document.getElementById('themeToggleText');
+            var icon = document.getElementById('themeToggleIcon');
+            if (text) text.textContent = theme === 'light' ? '深色' : '浅色';
+            if (icon) icon.textContent = theme === 'light' ? '☾' : '☀';
+        }
+
+        function toggleTheme() {
+            var nextTheme = getStoredTheme() === 'light' ? 'dark' : 'light';
+            try {
+                localStorage.setItem(THEME_KEY, nextTheme);
+            } catch (e) {}
+            applyTheme(nextTheme);
+        }
+
+        function checkSession() {
+            fetch('/api/status')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.has_session) {
+                        location.reload();
+                    }
+                })
+                .catch(function() {});
+        }
+
+        applyTheme(getStoredTheme());
+        setInterval(checkSession, 3000);
+    </script>
+</body>
+</html>
