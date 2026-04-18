@@ -65,3 +65,7 @@ ui_settings.json
 # Temporary build files
 *.tmp
 *.temp
+
+# Local handoff notes
+mowan后续发布迁移文档.md
+新线程背景上下文总结.md
